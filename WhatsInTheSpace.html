@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Eamon's Hangman Game</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Audiowide|Sofia|Trirong">
+    <style> 
+    
+    #word {
+  font-size: 60px;
+    display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  margin: 10px;
+  color: #ca5cd6;
+}
+
+h1 {
+transform: scale(2);
+color: #ca5cd6;
+}
+
+#incorrect {
+  font-size: 40px;
+  margin: 10px;
+  font-weight: bold;
+  color: red;
+  text-shadow: #59100a 2px 2px 3px;
+   display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+#gallows {
+    display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-size: 70px;
+  margin: 10px;
+}
+
+#word-bank {
+  font-size: 25px;
+  margin: 10px;
+  letter-spacing: 7px;
+   display: flex;
+  justify-content: left;
+  align-items: left;
+   animation: gradiantmove 6s ease-in-out infinite;
+   color: #ca5cd6;
+}
+
+#letter-guess {
+  border: solid white 4px;
+  font-size: 50px;
+  text-shadow: grey 3px 3px 7px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-family: "Audiowide", sans-serif;
+  border-radius: 5px;
+  margin: 2px;
+  padding: 2px;
+}
+
+#guess-button {
+  font-size: 0px;
+  margin: 0px;
+    display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  padding: 0px 0px;
+  visibility: hidden;
+}
+
+#starfield {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  z-index: -1;
+}
+
+.star {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: white;
+  border-radius: 100%;
+}
+
+.shake {
+ animation: shake 0.5s;
+}
+
+@keyframes shake {
+  0% { transform: translate(1px, 1px) rotate(0deg); }
+  10% { transform: translate(-1px, -2px) rotate(-1deg); }
+  20% { transform: translate(-3px, 0px) rotate(1deg); }
+  30% { transform: translate(3px, 2px) rotate(0deg); }
+  40% { transform: translate(1px, -1px) rotate(1deg); }
+  50% { transform: translate(-1px, 2px) rotate(-1deg); }
+  60% { transform: translate(-3px, 1px) rotate(0deg); }
+  70% { transform: translate(3px, 1px) rotate(-1deg); }
+  80% { transform: translate(-1px, -1px) rotate(1deg); }
+  90% { transform: translate(1px, 2px) rotate(0deg); }
+  100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
+    body {
+       display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+
+  font-family: "Audiowide", sans-serif;
+  animation: gradiantmove 6s ease-in-out infinite;
+  background-color: black;
+  text-shadow: grey 2px 2px 4px;
+}
+
+@keyframes gradiantmove {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+    opacity: 0.8;
+    letter-spacing: 4px;
+  }
+  100% {
+    background-position: 0% 50%;
+    opacity: 1;
+  }
+}
+    </style>
+  </head>
+  
+  <body>
+    <h1>What's in the Space?</h1>
+<br>
+<br>
+<br>
+<br>
+<hr>
+<br>
+   
+   <div id="word"></div>
+<div id="incorrect">Incorrect: 0</div>
+<div id="gallows"></div>
+<div>
+    <input type="text" id="letter-guess">
+    <button id="guess-button">Guess</button>
+</div>
+<div id="word-bank"></div>
+<div id="starfield"></div>
+
+    <script>
+// Array of words to choose from
+const words = ["earth", "planet", "gas", "stars", "uranus", "mars", "pluto", "neptune", "jupiter", "saturn", "venus", "northstar", "asteroid", "vega", "moon", "rocket", "milky way", "galaxy", "universe", "gravity", "blackhole", "dwarf", "astrononmer", "atmosphere", "elements", "astronaut", "asteroid belt", "big bang", "cosmos", "eclipse", "internationalspacestation", "lightyear", "meteor", "mass", "nebula", "equinox", "orbit", "satellite", "solstice", "telescope", "sun", "space", "shootingstar", "quasar", "observatory", "ellipticalorbit", "atom", "binarystar"];
+
+// Get a random word from the array
+const word = words[Math.floor(Math.random() * words.length)];
+
+// Initialize variables
+let incorrect = 0;
+let correct = 0;
+let lettersGuessed = [];
+
+// Get references to HTML elements
+const wordEl = document.getElementById("word");
+const incorrectEl = document.getElementById("incorrect");
+const gallowsEl = document.getElementById("gallows");
+const letterGuessEl = document.getElementById("letter-guess");
+const guessButton = document.getElementById("guess-button");
+const wordBankEl = document.getElementById("word-bank");
+
+// Function to update the word element
+function updateWord() {
+    let wordHTML = "";
+    for (let i = 0; i < word.length; i++) {
+        if (lettersGuessed.includes(word[i])) {
+            wordHTML += word[i] + " ";
+        } else {
+            wordHTML += "_ ";
+        }
+    }
+    wordEl.innerHTML = wordHTML;
+}
+
+// Function to update the word bank element
+function updateWordBank() {
+  let wordBankHTML = "Letters Guessed: ";
+  for (let i = 0; i < lettersGuessed.length; i++) {
+    wordBankHTML += lettersGuessed[i] + " ";
+  }
+  wordBankEl.innerHTML = wordBankHTML;
+}
+
+// Add event listener to the guess button
+guessButton.addEventListener("click", guess);
+
+// Add event listener to the letter guess input to submit on enter
+letterGuessEl.addEventListener("keyup", function(event) {
+  if (event.keyCode === 13) {
+    event.preventDefault();
+    guessButton.click();
+  }
+});
+
+// Function to handle player's guess
+function guess() {
+  const letter = letterGuessEl.value;
+if (letter.length !== 1) {
+    wordBankEl.innerHTML = "Please enter a single letter.";
+    letterGuessEl.classList.add("shake");
+    setTimeout(() => {
+        letterGuessEl.classList.remove("shake");
+    }, 500);
+    return;
+
+  } else if (!/^[a-zA-Z]*$/.test(letter)) {
+    wordBankEl.innerHTML = "Please enter a letter.";
+        letterGuessEl.classList.add("shake");
+    setTimeout(() => {
+        letterGuessEl.classList.remove("shake");
+    }, 500);
+    return;
+    
+  }
+  
+  if (lettersGuessed.includes(letter)) {
+    wordBankEl.innerHTML = "You already guessed that letter. Try again.";
+        letterGuessEl.classList.add("shake");
+    setTimeout(() => {
+        letterGuessEl.classList.remove("shake");
+    }, 500);
+    return;
+  }
+  lettersGuessed.push(letter);
+  if (word.includes(letter)) {
+    correct++;
+  } else {
+    incorrect++;
+    incorrectEl.innerHTML = `Incorrect: ${incorrect}`;
+    checkLose();
+  }
+  updateWord();
+  updateWordBank();
+  checkWin();
+  letterGuessEl.value = "";
+}
+
+// Function to check if player has won or lost
+function checkWin() {
+    // Create a set of unique letters in the word
+    const uniqueLetters = new Set(word.split(""));
+    // Iterate over the set and check if all the letters have been guessed
+    for (const letter of uniqueLetters) {
+        if (!lettersGuessed.includes(letter)) {
+            return;
+        }
+    }
+    // If all letters have been guessed, the player has won
+    alert("Congratulations! You won!");
+    return;
+}
+
+function checkLose() {
+    if (incorrect >= 9) {
+        alert("Sorry, you lost. The correct word was " + word + ".");
+       return;
+    }
+}
+
+// Update the word and word bank elements
+updateWord();
+updateWordBank();
+
+// Add event listener to the guess button
+guessButton.addEventListener("click", guess);
+
+const starfield = document.getElementById("starfield");
+
+for (let i = 0; i < 100; i++) {
+  let star = document.createElement("div");
+  star.className = "star";
+  star.style.top = Math.random() * 100 + "%";
+  star.style.left = Math.random() * 100 + "%";
+  starfield.appendChild(star);
+}
+
+setInterval(() => {
+  let stars = document.querySelectorAll(".star");
+  stars.forEach(star => {
+    let top = parseInt(star.style.top);
+    star.style.top = top - 1 + "%";
+    if (top < -5) {
+      star.style.top = "105%";
+    }
+  });
+}, 50);
+
+</script>
+  </body>
+</html>
