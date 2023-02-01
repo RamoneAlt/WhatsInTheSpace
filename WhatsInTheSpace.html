@@ -90,9 +90,10 @@ color: #ca5cd6;
 
 .star {
   position: absolute;
-  width: 6px;
-  height: 6px;
+  width: 54px;
+  height: 54px;
   background: whitesmoke;
+  opacity: 0.75;
   border-radius: 100%;
 }
 
@@ -289,7 +290,7 @@ guessButton.addEventListener("click", guess);
 
 const starfield = document.getElementById("starfield");
 
-for (let i = 0; i < 69; i++) {
+for (let i = 0; i < 12; i++) {
   let star = document.createElement("div");
   star.className = "star";
   star.style.top = Math.random() * 100 + "%";
@@ -306,7 +307,7 @@ setInterval(() => {
       star.style.top = "105%";
     }
   });
-}, 250);
+}, 75);
 
 </script>
   </body>
