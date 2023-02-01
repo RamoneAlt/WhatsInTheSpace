@@ -289,7 +289,7 @@ guessButton.addEventListener("click", guess);
 
 const starfield = document.getElementById("starfield");
 
-for (let i = 0; i < 100; i++) {
+for (let i = 0; i < 75; i++) {
   let star = document.createElement("div");
   star.className = "star";
   star.style.top = Math.random() * 100 + "%";
@@ -306,7 +306,7 @@ setInterval(() => {
       star.style.top = "105%";
     }
   });
-}, 50);
+}, 400);
 
 </script>
   </body>
